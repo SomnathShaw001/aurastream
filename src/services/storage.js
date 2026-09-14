@@ -26,20 +26,40 @@ export const saveStoredLiked = (tracks) => {
 export const getStoredPlaylists = () => {
   try {
     const raw = localStorage.getItem(KEYS.PLAYLISTS);
-    return raw ? JSON.parse(raw) : [
-      {
-        id: 'favorites',
-        name: 'Liked Songs',
-        description: 'Your favorite high-res tracks',
-        tracks: []
-      },
+    let parsed = raw ? JSON.parse(raw) : null;
+
+    const defaultPlaylists = [
       {
         id: 'chill-mix',
         name: 'Late Night Chill',
         description: 'Atmospheric vibes and deep beats',
+        image: 'https://images.unsplash.com/photo-1518609878373-06d740f60d8b?w=200&auto=format&fit=crop&q=80',
+        tracks: []
+      },
+      {
+        id: 'acoustic-vibes',
+        name: 'Acoustic Studio',
+        description: 'Warm acoustic sounds & vocals',
+        image: 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=200&auto=format&fit=crop&q=80',
         tracks: []
       }
     ];
+
+    if (!parsed || !Array.isArray(parsed) || parsed.length === 0) {
+      return defaultPlaylists;
+    }
+
+    // Remove redundant 'favorites' playlist if present (since Liked Songs has dedicated dock icon)
+    const filtered = parsed.filter((p) => p.id !== 'favorites');
+    if (filtered.length === 0) return defaultPlaylists;
+
+    // Ensure playlists have valid image covers
+    return filtered.map((pl) => {
+      if (!pl.image && pl.id === 'chill-mix') {
+        return { ...pl, image: 'https://images.unsplash.com/photo-1518609878373-06d740f60d8b?w=200&auto=format&fit=crop&q=80' };
+      }
+      return pl;
+    });
   } catch (e) {
     return [];
   }

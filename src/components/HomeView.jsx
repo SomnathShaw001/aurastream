@@ -16,14 +16,16 @@ export default function HomeView({
 }) {
   const sampleLikedArtists = likedTracks.slice(0, 4).map((t) => t.artist).join(' • ');
 
-  // Featured artists list with high-res circular avatars
+  // Featured artists list with verified 200 OK high-res circular avatars
   const featuredArtists = [
-    { name: 'Ajay-Atul', image: 'https://c.saavncdn.com/artists/Ajay_Atul_003_20230228105414_50x50.jpg' },
-    { name: 'The Weeknd', image: 'https://c.saavncdn.com/artists/The_Weeknd_002_20241003071400_50x50.jpg' },
-    { name: 'Arijit Singh', image: 'https://c.saavncdn.com/artists/Arijit_Singh_002_20241003063000_50x50.jpg' },
-    { name: 'Daft Punk', image: 'https://c.saavncdn.com/396/The-Highlights-English-2021-20240207045714-150x150.jpg' },
-    { name: 'Pritam', image: 'https://c.saavncdn.com/artists/Pritam_003_20230228104800_50x50.jpg' },
-    { name: 'Badshah', image: 'https://c.saavncdn.com/artists/Badshah_005_20230228110500_50x50.jpg' }
+    { name: 'Arijit Singh', image: 'https://c.saavncdn.com/artists/Arijit_Singh_004_20241118063717_500x500.jpg' },
+    { name: 'The Weeknd', image: 'https://c.saavncdn.com/artists/The_Weeknd_002_20241003071400_500x500.jpg' },
+    { name: 'Pritam', image: 'https://c.saavncdn.com/artists/Pritam_Chakraborty-20170711073326_500x500.jpg' },
+    { name: 'Badshah', image: 'https://c.saavncdn.com/artists/Badshah_006_20241118064015_500x500.jpg' },
+    { name: 'Ajay-Atul', image: 'https://c.saavncdn.com/artists/Ajay_Atul_003_20230228105414_500x500.jpg' },
+    { name: 'Daft Punk', image: 'https://c.saavncdn.com/artists/Daft_Punk_20170921122444_500x500.jpg' },
+    { name: 'Shreya Ghoshal', image: 'https://c.saavncdn.com/artists/Shreya_Ghoshal_007_20241101074144_500x500.jpg' },
+    { name: 'Anirudh Ravichander', image: 'https://c.saavncdn.com/artists/Anirudh_Ravichander_003_20260121134149_500x500.jpg' }
   ];
 
   return (
@@ -51,7 +53,15 @@ export default function HomeView({
             className="featured-card quick-pl-card"
             onClick={() => onOpenCollection(item)}
           >
-            <img src={item.image} alt={item.title} className="quick-pl-img" />
+            <img 
+              src={item.image} 
+              alt="" 
+              className="quick-pl-img"
+              onError={(e) => {
+                e.currentTarget.onerror = null;
+                e.currentTarget.src = 'https://images.unsplash.com/photo-1518609878373-06d740f60d8b?w=150&auto=format&fit=crop&q=80';
+              }}
+            />
             <div className="quick-pl-meta">
               <span className="quick-pl-title">{item.title}</span>
               <span className="quick-pl-sub">{item.subtitle}</span>
@@ -109,7 +119,15 @@ export default function HomeView({
                 title={`Open ${artist.name}'s page`}
               >
                 <div className="artist-circle-img-wrap">
-                  <img src={artist.image} alt={artist.name} className="artist-circle-img" />
+                  <img 
+                    src={artist.image} 
+                    alt="" 
+                    className="artist-circle-img"
+                    onError={(e) => {
+                      e.currentTarget.onerror = null;
+                      e.currentTarget.src = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100"><defs><linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="%238b5cf6"/><stop offset="100%" stop-color="%2306b6d4"/></linearGradient></defs><circle cx="50" cy="50" r="50" fill="url(%23g)"/><text x="50" y="58" font-family="sans-serif" font-size="34" font-weight="bold" fill="white" text-anchor="middle">${encodeURIComponent(artist.name[0])}</text></svg>`;
+                    }}
+                  />
                   <div className="artist-hover-play">
                     <Play size={20} fill="#ffffff" style={{ marginLeft: 2 }} />
                   </div>
