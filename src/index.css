@@ -1338,3 +1338,1022 @@ body {
     font-size: 26px;
   }
 }
+
+/* ==========================================================================
+   SPICETIFY CHASSIS, DOCK, THEMES & AUDIO DECK STYLES (Images 1, 2, 4, 5)
+   ========================================================================== */
+
+/* 1. Theme Color Palettes */
+.theme-lime {
+  --chassis-border: #b8ea24;
+  --theme-bg: #0b0d09;
+  --theme-player-bg: #070906;
+  --theme-dock-bg: rgba(0, 0, 0, 0.45);
+  --theme-header-bg: rgba(11, 13, 9, 0.85);
+  --theme-accent: #b8ea24;
+  --theme-accent-hover: #c9f538;
+  --theme-pill-active: #b8ea24;
+  --theme-pill-text: #000000;
+  --theme-progress: #b8ea24;
+  --theme-card-bg: rgba(255, 255, 255, 0.04);
+  --theme-card-hover: rgba(255, 255, 255, 0.08);
+  --theme-text-main: #f4f4f5;
+  --theme-text-muted: #a1a1aa;
+}
+
+.theme-crimson {
+  --chassis-border: #d32f2f;
+  --theme-bg: #141416;
+  --theme-player-bg: #0e0e10;
+  --theme-dock-bg: rgba(0, 0, 0, 0.5);
+  --theme-header-bg: rgba(20, 20, 22, 0.88);
+  --theme-accent: #ff334b;
+  --theme-accent-hover: #ff5c70;
+  --theme-pill-active: #ff8a65;
+  --theme-pill-text: #000000;
+  --theme-progress: #ffd600; /* Vibrant yellow seekbar like Image 4! */
+  --theme-card-bg: rgba(255, 255, 255, 0.04);
+  --theme-card-hover: rgba(255, 255, 255, 0.08);
+  --theme-text-main: #f4f4f5;
+  --theme-text-muted: #a1a1aa;
+}
+
+.theme-burgundy {
+  --chassis-border: #f5ebd7; /* Cream chassis border like Image 2 */
+  --theme-bg: #350b11;      /* Deep royal burgundy */
+  --theme-player-bg: #28080d;
+  --theme-dock-bg: #2b080e;
+  --theme-header-bg: rgba(53, 11, 17, 0.9);
+  --theme-accent: #e5a93c;   /* Warm golden yellow */
+  --theme-accent-hover: #f3be5d;
+  --theme-pill-active: #e5a93c;
+  --theme-pill-text: #28080d;
+  --theme-progress: #e5a93c;
+  --theme-card-bg: rgba(255, 255, 255, 0.06);
+  --theme-card-hover: rgba(255, 255, 255, 0.12);
+  --theme-text-main: #fcf8f2;
+  --theme-text-muted: #d4b8a2;
+}
+
+.theme-obsidian {
+  --chassis-border: #8b5cf6;
+  --theme-bg: #090a0f;
+  --theme-player-bg: #06070a;
+  --theme-dock-bg: rgba(0, 0, 0, 0.45);
+  --theme-header-bg: rgba(9, 10, 15, 0.88);
+  --theme-accent: #8b5cf6;
+  --theme-accent-hover: #a78bfa;
+  --theme-pill-active: #8b5cf6;
+  --theme-pill-text: #ffffff;
+  --theme-progress: #8b5cf6;
+  --theme-card-bg: rgba(255, 255, 255, 0.04);
+  --theme-card-hover: rgba(255, 255, 255, 0.08);
+  --theme-text-main: #f8fafc;
+  --theme-text-muted: #94a3b8;
+}
+
+/* 2. Outer Window Chassis Bezel */
+.spicetify-chassis {
+  width: 100vw;
+  height: 100vh;
+  padding: 10px;
+  background-color: var(--chassis-border);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  position: relative;
+  transition: background-color 0.35s ease;
+  user-select: none;
+}
+
+.spicetify-app-frame {
+  flex: 1;
+  display: flex;
+  background-color: var(--theme-bg);
+  border-radius: 12px 12px 0 0;
+  overflow: hidden;
+  position: relative;
+}
+
+.spicetify-main-viewport {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+  position: relative;
+  background-color: var(--theme-bg);
+}
+
+/* 3. Ultra-Slim Spicetify Dock Sidebar */
+.dock-sidebar {
+  width: 62px;
+  background-color: var(--theme-dock-bg);
+  border-right: 1px solid rgba(255, 255, 255, 0.05);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 18px 0;
+  gap: 14px;
+  z-index: 15;
+  flex-shrink: 0;
+}
+
+.dock-btn {
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  background: transparent;
+  border: none;
+  color: var(--theme-text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  position: relative;
+  transition: all var(--transition-fast);
+}
+
+.dock-btn:hover {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.dock-btn.active {
+  background: var(--theme-pill-active);
+  color: var(--theme-pill-text);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
+}
+
+.dock-badge-dot {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #ff334b;
+}
+
+.dock-divider {
+  width: 28px;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.1);
+  margin: 4px 0;
+}
+
+.dock-scroll-items {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  width: 100%;
+  padding: 4px 0;
+}
+
+.dock-avatar-btn {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  background: transparent;
+  padding: 0;
+  cursor: pointer;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition-fast);
+  flex-shrink: 0;
+}
+
+.dock-avatar-btn:hover {
+  transform: scale(1.1);
+  border-color: var(--theme-accent);
+}
+
+.dock-avatar-btn.active {
+  border-color: var(--theme-pill-active);
+  box-shadow: 0 0 12px var(--theme-pill-active);
+}
+
+.dock-avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.dock-avatar-fallback {
+  width: 100%;
+  height: 100%;
+  color: #ffffff;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dock-add-btn {
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--theme-text-muted);
+  border: 1px dashed rgba(255, 255, 255, 0.2);
+}
+
+.dock-add-btn:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+}
+
+/* 4. Spicetify Header */
+.spicetify-header {
+  height: 64px;
+  padding: 0 24px;
+  background-color: var(--theme-header-bg);
+  backdrop-filter: blur(20px);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  z-index: 25;
+  flex-shrink: 0;
+}
+
+.header-left-group {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.nav-arrows {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.arrow-circle-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  color: var(--theme-text-main);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.arrow-circle-btn:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.12);
+  transform: scale(1.05);
+}
+
+.arrow-circle-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.category-pills {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.cat-pill {
+  background: rgba(255, 255, 255, 0.08);
+  border: none;
+  border-radius: 20px;
+  padding: 6px 16px;
+  color: var(--theme-text-main);
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.cat-pill:hover {
+  background: rgba(255, 255, 255, 0.14);
+}
+
+.cat-pill.active {
+  background: var(--theme-pill-active);
+  color: var(--theme-pill-text);
+  font-weight: 700;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.35);
+}
+
+.header-right-group {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.search-wrapper-compact {
+  position: relative;
+  width: 280px;
+}
+
+.search-input-compact {
+  width: 100%;
+  height: 36px;
+  padding: 0 14px 0 36px;
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 18px;
+  color: var(--theme-text-main);
+  font-family: var(--font-body);
+  font-size: 13px;
+  outline: none;
+  transition: all var(--transition-fast);
+}
+
+.search-input-compact:focus {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: var(--theme-accent);
+  box-shadow: 0 0 14px rgba(184, 234, 36, 0.2);
+}
+
+.search-icon-compact {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--theme-text-muted);
+  pointer-events: none;
+}
+
+.theme-badge-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 6px 12px;
+  border-radius: 18px;
+  color: var(--theme-text-main);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.theme-badge-btn:hover {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.theme-dropdown-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  background: #181920;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 12px;
+  box-shadow: 0 14px 35px rgba(0, 0, 0, 0.75);
+  padding: 6px;
+  z-index: 100;
+  min-width: 210px;
+}
+
+.theme-dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 13px;
+  color: #ffffff;
+  cursor: pointer;
+  transition: background var(--transition-fast);
+}
+
+.theme-dropdown-item:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.theme-dropdown-item.active {
+  background: rgba(255, 255, 255, 0.14);
+  font-weight: 700;
+}
+
+.user-avatar-circle {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--theme-text-main);
+  cursor: pointer;
+}
+
+/* 5. Home View & Featured Cards (Image 4) */
+.home-view-container {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  width: 100%;
+}
+
+.home-featured-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr;
+  gap: 16px;
+  width: 100%;
+}
+
+@media (max-width: 1200px) {
+  .home-featured-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.featured-card {
+  position: relative;
+  background: var(--theme-card-bg);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 14px;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  overflow: hidden;
+}
+
+.featured-card:hover {
+  background: var(--theme-card-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+}
+
+.liked-songs-card {
+  background: linear-gradient(135deg, #5c24e5 0%, #2f1278 100%);
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 180px;
+}
+
+.liked-card-artists {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.85);
+  line-height: 1.5;
+  font-weight: 500;
+  max-width: 80%;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.liked-card-bottom {
+  margin-top: 20px;
+}
+
+.liked-card-title {
+  font-family: var(--font-display);
+  font-size: 28px;
+  font-weight: 800;
+  color: #ffffff;
+  letter-spacing: -0.5px;
+}
+
+.liked-card-count {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.7);
+  margin-top: 2px;
+}
+
+.floating-play-btn {
+  position: absolute;
+  right: 18px;
+  bottom: 18px;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--theme-accent);
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.floating-play-btn:hover {
+  transform: scale(1.1);
+}
+
+.quick-pl-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px;
+}
+
+.quick-pl-img {
+  width: 64px;
+  height: 64px;
+  border-radius: 8px;
+  object-fit: cover;
+  flex-shrink: 0;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+.quick-pl-meta {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.quick-pl-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--theme-text-main);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.quick-pl-sub {
+  font-size: 12px;
+  color: var(--theme-text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.home-section {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+/* Circular Artist Cards */
+.artists-circles-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: 20px;
+}
+
+.artist-circle-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 14px 10px;
+  background: var(--theme-card-bg);
+  border-radius: 14px;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.artist-circle-card:hover {
+  background: var(--theme-card-hover);
+  transform: translateY(-4px);
+}
+
+.artist-circle-img-wrap {
+  position: relative;
+  width: 90px;
+  height: 90px;
+  margin-bottom: 10px;
+}
+
+.artist-circle-img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.45);
+}
+
+.artist-hover-play {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity var(--transition-fast);
+}
+
+.artist-circle-card:hover .artist-hover-play {
+  opacity: 1;
+}
+
+.artist-circle-name {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--theme-text-main);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+.artist-circle-sub {
+  font-size: 11px;
+  color: var(--theme-text-muted);
+  margin-top: 2px;
+}
+
+/* 6. Floating Now Playing Cover Art Widget (Image 4) */
+.spicetify-floating-cover {
+  position: absolute;
+  right: 28px;
+  bottom: 24px;
+  width: 170px;
+  height: 170px;
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  cursor: pointer;
+  z-index: 20;
+  transition: all var(--transition-fast);
+}
+
+.spicetify-floating-cover:hover {
+  transform: scale(1.05);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.85);
+  border-color: var(--theme-accent);
+}
+
+.floating-cover-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.floating-cover-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, transparent 40%, rgba(0, 0, 0, 0.85) 100%);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 10px;
+  opacity: 0;
+  transition: opacity var(--transition-fast);
+}
+
+.spicetify-floating-cover:hover .floating-cover-overlay {
+  opacity: 1;
+}
+
+.floating-cover-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: #ffffff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.floating-cover-artist {
+  font-size: 11px;
+  color: var(--theme-accent);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* 7. Bottom Player Bar (Images 2, 4, 5) */
+.spicetify-player-bar {
+  height: 70px;
+  background-color: var(--theme-player-bg);
+  border-radius: 0 0 12px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  position: relative;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  flex-shrink: 0;
+  z-index: 30;
+}
+
+.spicetify-player-bar.empty {
+  opacity: 0.6;
+}
+
+/* Edge-to-Edge Seekbar across the top of the player */
+.edge-progress-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: rgba(255, 255, 255, 0.1);
+  cursor: pointer;
+  transition: height var(--transition-fast);
+}
+
+.edge-progress-container.hovered,
+.edge-progress-container:hover {
+  height: 6px;
+}
+
+.edge-progress-buffered {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.18);
+}
+
+.edge-progress-fill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  background: var(--theme-progress);
+  box-shadow: 0 0 8px var(--theme-progress);
+  position: relative;
+}
+
+.edge-progress-thumb {
+  position: absolute;
+  right: -5px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #ffffff;
+  box-shadow: 0 0 6px rgba(0, 0, 0, 0.6);
+  opacity: 0;
+  transition: opacity var(--transition-fast);
+}
+
+.edge-progress-container:hover .edge-progress-thumb {
+  opacity: 1;
+}
+
+/* Player Left Controls */
+.player-left-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.player-icon-btn {
+  background: transparent;
+  border: none;
+  color: var(--theme-text-muted);
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.player-icon-btn:hover:not(.disabled) {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.player-icon-btn.active {
+  color: var(--theme-accent);
+}
+
+.player-icon-btn.disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.spicetify-play-circle {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: var(--theme-accent);
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
+  transition: all var(--transition-fast);
+}
+
+.spicetify-play-circle:hover:not(.disabled) {
+  transform: scale(1.08);
+  background: var(--theme-accent-hover);
+}
+
+.spicetify-play-circle.disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* Player Center Track */
+.player-center-track {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  max-width: 420px;
+}
+
+.spicetify-player-thumb {
+  width: 44px;
+  height: 44px;
+  border-radius: 8px;
+  object-fit: cover;
+  flex-shrink: 0;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+}
+
+.spicetify-track-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.spicetify-track-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--theme-text-main);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.spicetify-track-sub {
+  font-size: 11px;
+  color: var(--theme-text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.heart-btn {
+  background: transparent;
+  border: none;
+  color: var(--theme-text-muted);
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition-fast);
+}
+
+.heart-btn:hover {
+  transform: scale(1.15);
+}
+
+.spicetify-time-indicator {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--theme-text-muted);
+  margin-left: 8px;
+}
+
+.time-divider {
+  opacity: 0.4;
+}
+
+/* Player Right Actions & Volume (Image 1 fix) */
+.player-right-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.quality-pill.compact {
+  padding: 3px 8px;
+  font-size: 10px;
+}
+
+.spicetify-volume-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 120px;
+}
+
+.volume-mute-btn {
+  padding: 2px;
+  flex-shrink: 0;
+}
+
+.spicetify-slider-track-wrap {
+  flex: 1;
+  display: flex;
+  align-items: center;
+}
+
+.spicetify-vol-slider {
+  width: 100%;
+  height: 4px;
+  -webkit-appearance: none;
+  appearance: none;
+  background: linear-gradient(
+    to right,
+    var(--theme-accent) 0%,
+    var(--theme-accent) var(--vol-percent, 80%),
+    rgba(255, 255, 255, 0.2) var(--vol-percent, 80%),
+    rgba(255, 255, 255, 0.2) 100%
+  );
+  border-radius: 2px;
+  outline: none;
+  cursor: pointer;
+  transition: height var(--transition-fast);
+}
+
+.spicetify-vol-slider:hover {
+  height: 6px;
+}
+
+.spicetify-vol-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #ffffff;
+  cursor: pointer;
+  box-shadow: 0 0 6px rgba(0, 0, 0, 0.6);
+  border: 1px solid rgba(0, 0, 0, 0.15);
+}
+
+.spicetify-vol-slider::-moz-range-thumb {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #ffffff;
+  cursor: pointer;
+  box-shadow: 0 0 6px rgba(0, 0, 0, 0.6);
+  border: 1px solid rgba(0, 0, 0, 0.15);
+}
+
+/* 8. Tab View & Collection Layouts */
+.tab-view-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 100%;
+}
+
+.collection-header-wrap {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  margin-bottom: 20px;
+}
+
+.collection-cover-img {
+  width: 130px;
+  height: 130px;
+  border-radius: 14px;
+  object-fit: cover;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
+
+.collection-cover-placeholder {
+  width: 130px;
+  height: 130px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, var(--theme-accent), #3b82f6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
+
+.collection-title {
+  font-family: var(--font-display);
+  font-size: 32px;
+  font-weight: 800;
+  margin-top: 6px;
+  color: var(--theme-text-main);
+}
+
+.collection-sub {
+  color: var(--theme-text-muted);
+  font-size: 13px;
+  margin-top: 4px;
+}
+

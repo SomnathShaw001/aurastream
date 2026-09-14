@@ -64,14 +64,19 @@ class AudioEngine {
       this.analyser.fftSize = 256;
       this.analyser.smoothingTimeConstant = 0.82;
 
-      // Connect graph: source -> eq[0] -> ... -> eq[9] -> analyser -> destination
+      // Create master gain node for rock-solid volume and mute control
+      this.gainNode = this.audioCtx.createGain();
+      this.gainNode.gain.value = this.audio.muted ? 0 : this.audio.volume;
+
+      // Connect graph: source -> eq[0] -> ... -> eq[9] -> analyser -> gainNode -> destination
       let prevNode = this.sourceNode;
       for (const filter of this.eqFilters) {
         prevNode.connect(filter);
         prevNode = filter;
       }
       prevNode.connect(this.analyser);
-      this.analyser.connect(this.audioCtx.destination);
+      this.analyser.connect(this.gainNode);
+      this.gainNode.connect(this.audioCtx.destination);
 
       this.isInitialized = true;
     } catch (e) {
@@ -104,6 +109,13 @@ class AudioEngine {
     this.audio.addEventListener('loadedmetadata', () => {
       this._emit('loadedmetadata', {
         duration: this.audio.duration
+      });
+    });
+
+    this.audio.addEventListener('volumechange', () => {
+      this._emit('volumechange', {
+        volume: this.audio.volume,
+        muted: this.audio.muted
       });
     });
   }
@@ -180,7 +192,32 @@ class AudioEngine {
   }
 
   setVolume(vol) {
-    this.audio.volume = Math.max(0, Math.min(1, vol));
+    const clamped = Math.max(0, Math.min(1, vol));
+    this.audio.volume = clamped;
+    if (this.gainNode && this.audioCtx) {
+      const targetGain = this.audio.muted ? 0 : clamped;
+      this.gainNode.gain.setValueAtTime(targetGain, this.audioCtx.currentTime);
+    }
+    if (clamped > 0 && this.audio.muted) {
+      this.setMuted(false);
+    }
+  }
+
+  setMuted(muted) {
+    const isMuted = Boolean(muted);
+    this.audio.muted = isMuted;
+    if (this.gainNode && this.audioCtx) {
+      const targetGain = isMuted ? 0 : this.audio.volume;
+      this.gainNode.gain.setValueAtTime(targetGain, this.audioCtx.currentTime);
+    }
+    this._emit('volumechange', {
+      volume: this.audio.volume,
+      muted: isMuted
+    });
+  }
+
+  isMuted() {
+    return Boolean(this.audio.muted);
   }
 
   getVolume() {

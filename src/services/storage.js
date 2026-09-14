@@ -74,12 +74,14 @@ export const getStoredSettings = () => {
   try {
     const raw = localStorage.getItem(KEYS.SETTINGS);
     return raw ? JSON.parse(raw) : {
-      bitrate: '320', // '320', '160', '96'
+      bitrate: '320',
       volume: 0.85,
-      eqPreset: 'Electronic'
+      isMuted: false,
+      eqPreset: 'Electronic',
+      theme: 'lime' // 'lime' | 'crimson' | 'burgundy' | 'obsidian'
     };
   } catch (e) {
-    return { bitrate: '320', volume: 0.85, eqPreset: 'Electronic' };
+    return { bitrate: '320', volume: 0.85, isMuted: false, eqPreset: 'Electronic', theme: 'lime' };
   }
 };
 
