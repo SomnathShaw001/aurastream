@@ -1368,16 +1368,16 @@ body {
 }
 
 .theme-obsidian {
-  --chassis-border: #8b5cf6;
+  --chassis-border: #10b981;
   --theme-bg: #090a0f;
   --theme-player-bg: #06070a;
   --theme-dock-bg: #06070a;
   --theme-header-bg: #090a0f;
-  --theme-accent: #8b5cf6;
-  --theme-accent-hover: #a78bfa;
-  --theme-pill-active: #8b5cf6;
-  --theme-pill-text: #ffffff;
-  --theme-progress: #8b5cf6;
+  --theme-accent: #10b981;
+  --theme-accent-hover: #34d399;
+  --theme-pill-active: #10b981;
+  --theme-pill-text: #000000;
+  --theme-progress: #10b981;
   --theme-card-bg: #11121c;
   --theme-card-hover: #181a28;
   --theme-text-main: #f8fafc;

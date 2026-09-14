@@ -308,34 +308,34 @@ class AudioEngine {
     }
   }
 
-  // Direct offline download of song as MP3 in current streaming quality (same tab, no popups)
+  // Direct offline download of song as MP3 in current streaming quality (same tab, zero redirects)
   async downloadTrack(track = this.currentTrack, bitrate = this.bitrate) {
     const targetTrack = track || this.currentTrack;
     if (!targetTrack) return;
 
     const streamBitrate = bitrate || this.bitrate || '320';
-    const url = targetTrack.audioStreams?.[streamBitrate] ||
-                targetTrack.audioStreams?.['320'] ||
-                targetTrack.audioStreams?.['160'] ||
-                targetTrack.audioStreams?.['96'] ||
-                this.audio?.src;
-
-    if (!url) {
-      console.warn('No audio stream available to download');
-      return;
-    }
-
     const cleanArtist = (targetTrack.artist || 'Unknown Artist').replace(/[\\/:*?"<>|]/g, '_').trim();
     const cleanTitle = (targetTrack.title || 'Track').replace(/[\\/:*?"<>|]/g, '_').trim();
     const safeFilename = `${cleanArtist} - ${cleanTitle} [${streamBitrate}kbps].mp3`;
 
-    try {
-      // Fetch audio data and create a Blob URL for instant direct download in the same tab
-      const response = await fetch(url);
-      if (!response.ok) throw new Error(`HTTP error ${response.status}`);
-      const blob = await response.blob();
-      const blobUrl = URL.createObjectURL(blob);
+    // Gather candidate stream URLs in priority order
+    const candidateUrls = [
+      targetTrack.audioStreams?.[streamBitrate],
+      targetTrack.audioStreams?.['320'],
+      targetTrack.audioStreams?.['160'],
+      targetTrack.audioStreams?.['96'],
+      targetTrack.audioStreams?.default,
+      this.audio?.src
+    ].filter((u, idx, arr) => Boolean(u) && arr.indexOf(u) === idx);
 
+    if (candidateUrls.length === 0) {
+      console.warn('No audio stream available to download');
+      return;
+    }
+
+    const triggerBlobDownload = (blob) => {
+      const audioBlob = new Blob([blob], { type: 'audio/mpeg' });
+      const blobUrl = URL.createObjectURL(audioBlob);
       const anchor = document.createElement('a');
       anchor.href = blobUrl;
       anchor.download = safeFilename;
@@ -343,17 +343,53 @@ class AudioEngine {
       document.body.appendChild(anchor);
       anchor.click();
       document.body.removeChild(anchor);
+      setTimeout(() => URL.revokeObjectURL(blobUrl), 20000);
+    };
 
-      setTimeout(() => URL.revokeObjectURL(blobUrl), 15000);
+    // Strategy 1: Attempt direct client-side fetch on candidate URLs
+    for (const candUrl of candidateUrls) {
+      try {
+        const response = await fetch(candUrl, { mode: 'cors' });
+        if (response.ok) {
+          const blob = await response.blob();
+          if (blob && blob.size > 1000) {
+            triggerBlobDownload(blob);
+            return;
+          }
+        }
+      } catch (err) {
+        // Continue to next candidate or proxy strategy
+      }
+    }
+
+    // Strategy 2: Same-origin API download proxy (/api/download) via fetch
+    const primaryUrl = candidateUrls[0];
+    const proxyUrl = `/api/download?url=${encodeURIComponent(primaryUrl)}&filename=${encodeURIComponent(safeFilename)}`;
+
+    try {
+      const proxyRes = await fetch(proxyUrl);
+      if (proxyRes.ok) {
+        const blob = await proxyRes.blob();
+        if (blob && blob.size > 1000) {
+          triggerBlobDownload(blob);
+          return;
+        }
+      }
     } catch (err) {
-      console.warn('Direct blob download failed, triggering fallback download:', err);
-      const anchor = document.createElement('a');
-      anchor.href = url;
-      anchor.download = safeFilename;
-      anchor.style.display = 'none';
-      document.body.appendChild(anchor);
-      anchor.click();
-      document.body.removeChild(anchor);
+      console.warn('API download proxy fetch failed, using background iframe trigger:', err);
+    }
+
+    // Strategy 3: Hidden iframe attachment trigger (100% immune to tab redirection)
+    try {
+      const iframe = document.createElement('iframe');
+      iframe.style.display = 'none';
+      iframe.src = proxyUrl;
+      document.body.appendChild(iframe);
+      setTimeout(() => {
+        try { document.body.removeChild(iframe); } catch (e) {}
+      }, 25000);
+    } catch (err) {
+      console.error('All direct download mechanisms failed:', err);
     }
   }
 

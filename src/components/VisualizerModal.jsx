@@ -49,12 +49,12 @@ export default function VisualizerModal({ track, isPlaying, onClose }) {
           // Dynamic neon gradient for each bar
           const gradient = ctx.createLinearGradient(0, height - barHeight, 0, height);
           gradient.addColorStop(0, '#06b6d4');
-          gradient.addColorStop(0.5, '#8b5cf6');
-          gradient.addColorStop(1, '#ec4899');
+          gradient.addColorStop(0.5, '#10b981');
+          gradient.addColorStop(1, '#14b8a6');
 
           ctx.fillStyle = gradient;
           ctx.shadowBlur = 14;
-          ctx.shadowColor = '#8b5cf6';
+          ctx.shadowColor = '#10b981';
           ctx.beginPath();
           ctx.roundRect(x, height - barHeight - 10, barWidth, barHeight, [4, 4, 0, 0]);
           ctx.fill();

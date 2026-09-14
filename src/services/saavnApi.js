@@ -58,9 +58,19 @@ export function getAudioStreamUrls(encryptedUrl) {
 export function formatSong(raw) {
   if (!raw) return null;
 
-  const audioStreams = raw.encrypted_media_url
-    ? getAudioStreamUrls(raw.encrypted_media_url)
-    : null;
+  const encUrl = raw.encrypted_media_url || raw.more_info?.encrypted_media_url;
+  let audioStreams = encUrl ? getAudioStreamUrls(encUrl) : null;
+
+  // Fallback to media_preview_url if encrypted URL is unavailable
+  const previewUrl = raw.media_preview_url || raw.more_info?.media_preview_url;
+  if (!audioStreams && previewUrl) {
+    audioStreams = {
+      '320': previewUrl,
+      '160': previewUrl,
+      '96': previewUrl,
+      default: previewUrl
+    };
+  }
 
   const title = decodeHtml(raw.song || raw.title || 'Unknown Track');
   const artist = decodeHtml(
@@ -81,7 +91,7 @@ export function formatSong(raw) {
     duration: parseInt(raw.duration || raw.more_info?.duration || 0, 10),
     image: getHighResImage(raw.image),
     imageSmall: raw.image?.replace('http:', 'https:') || '',
-    encrypted_media_url: raw.encrypted_media_url || raw.more_info?.encrypted_media_url,
+    encrypted_media_url: encUrl,
     audioStreams,
     has_lyrics: raw.has_lyrics === 'true' || raw.has_lyrics === true,
     copyright: decodeHtml(raw.copyright_text || '')
@@ -142,7 +152,8 @@ export async function getAutocomplete(query) {
   }));
 
   const albums = (data.albums?.data || []).map((a) => ({
-    id: a.id,
+    id: a.id || a.albumid,
+    type: 'album',
     title: decodeHtml(a.title),
     subtitle: decodeHtml(a.subtitle || a.description),
     image: getHighResImage(a.image)
@@ -170,8 +181,8 @@ export async function getHomepageData() {
 
   // Extract trending tracks, albums, playlists
   const trending = (data.new_trending || []).map((item) => ({
-    id: item.id,
-    type: item.type,
+    id: item.id || item.albumid,
+    type: item.type || 'playlist',
     title: decodeHtml(item.title),
     subtitle: decodeHtml(item.subtitle),
     image: getHighResImage(item.image),
@@ -180,6 +191,7 @@ export async function getHomepageData() {
 
   const charts = (data.charts || []).map((item) => ({
     id: item.id,
+    type: 'playlist',
     title: decodeHtml(item.title),
     subtitle: decodeHtml(item.subtitle || `${item.count || ''} Tracks`),
     image: getHighResImage(item.image)
@@ -187,24 +199,32 @@ export async function getHomepageData() {
 
   const topPlaylists = (data.top_playlists || []).map((item) => ({
     id: item.id,
+    type: 'playlist',
     title: decodeHtml(item.title),
     subtitle: decodeHtml(item.subtitle || `${item.more_info?.song_count || ''} Tracks`),
     image: getHighResImage(item.image)
   }));
 
   const newAlbums = (data.new_albums || []).map((item) => ({
-    id: item.id,
+    id: item.id || item.albumid,
+    albumid: item.id || item.albumid,
+    type: 'album',
     title: decodeHtml(item.title),
     subtitle: decodeHtml(item.subtitle || item.more_info?.release_date || ''),
     image: getHighResImage(item.image)
   }));
 
-  return {
+  const result = {
     trending,
     charts,
     topPlaylists,
     newAlbums
   };
+
+  // Silently warm cache in background for top items so clicking is instantaneous
+  prefetchHomepageCollections(result);
+
+  return result;
 }
 
 // Song details
@@ -225,10 +245,41 @@ export async function getSongDetails(songId) {
 export const artistCache = new Map();
 export const collectionCache = new Map();
 
+// Known top artists direct ID mapping to eliminate search roundtrip (50% speedup)
+const POPULAR_ARTISTS_FAST_MAP = {
+  'arijit singh': '459320',
+  'the weeknd': '474937',
+  'pritam': '456208',
+  'badshah': '456863',
+  'ajay-atul': '456345',
+  'daft punk': '457173',
+  'shreya ghoshal': '455125',
+  'anirudh ravichander': '887274',
+  'diljit dosanjh': '464932',
+  'yo yo honey singh': '456499',
+  'a.r. rahman': '452310',
+  'ar rahman': '452310',
+  'sidhu moose wala': '1116376',
+  'neha kakkar': '458918',
+  'atif aslam': '455132',
+  'kk': '455130',
+  'ed sheeran': '484085',
+  'taylor swift': '483247',
+  'drake': '458925',
+  'eminem': '458923',
+  'justin bieber': '458920',
+  'billie eilish': '3222384',
+  'dua lipa': '879857',
+  'post malone': '1046187',
+  'bruno mars': '458921',
+  'coldplay': '458922'
+};
+
 // Playlist details & tracks
 export async function getPlaylistDetails(listId) {
-  if (collectionCache.has(`pl-${listId}`)) {
-    return collectionCache.get(`pl-${listId}`);
+  const cleanId = String(listId || '').trim();
+  if (collectionCache.has(`pl-${cleanId}`)) {
+    return collectionCache.get(`pl-${cleanId}`);
   }
 
   const data = await fetchApi({
@@ -236,45 +287,71 @@ export async function getPlaylistDetails(listId) {
     _format: 'json',
     cc: 'in',
     _marker: '0',
-    listid: listId
+    listid: cleanId
   });
 
   const songs = (data.songs || data.list || []).map(formatSong).filter(Boolean);
   const result = {
-    id: data.id || listId,
-    title: decodeHtml(data.title || data.listname),
+    id: data.id || cleanId,
+    type: 'playlist',
+    title: decodeHtml(data.title || data.listname || 'Playlist'),
     subtitle: decodeHtml(data.subtitle || `${songs.length} songs`),
     image: getHighResImage(data.image),
     songs
   };
-  collectionCache.set(`pl-${listId}`, result);
+  collectionCache.set(`pl-${cleanId}`, result);
   return result;
 }
 
-// Album details & tracks
-export async function getAlbumDetails(albumId) {
-  if (collectionCache.has(`album-${albumId}`)) {
-    return collectionCache.get(`album-${albumId}`);
+// Album details & tracks (with resilient search fallback so albums never show blank)
+export async function getAlbumDetails(albumId, fallbackTitle = '') {
+  const cleanId = String(albumId || '').trim();
+  const cacheKey = `album-${cleanId || fallbackTitle}`;
+  if (collectionCache.has(cacheKey)) {
+    return collectionCache.get(cacheKey);
   }
 
-  const data = await fetchApi({
-    __call: 'content.getAlbumDetails',
-    _format: 'json',
-    cc: 'in',
-    _marker: '0',
-    albumid: albumId
-  });
+  let songs = [];
+  let albumData = null;
 
-  const songs = (data.songs || data.list || []).map(formatSong).filter(Boolean);
+  if (cleanId && cleanId !== 'undefined') {
+    try {
+      albumData = await fetchApi({
+        __call: 'content.getAlbumDetails',
+        _format: 'json',
+        cc: 'in',
+        _marker: '0',
+        albumid: cleanId
+      });
+      songs = (albumData?.songs || albumData?.list || []).map(formatSong).filter(Boolean);
+    } catch (err) {
+      console.warn('content.getAlbumDetails failed for id', cleanId, err);
+    }
+  }
+
+  // Fallback: If album details API returned 0 songs, search songs by title to prevent blank album
+  const searchTitle = fallbackTitle || albumData?.title || albumData?.name || '';
+  if (songs.length === 0 && searchTitle) {
+    try {
+      const searchRes = await searchSongs(searchTitle, 1, 30);
+      songs = searchRes.songs || [];
+    } catch (e) {
+      console.warn('Album fallback search failed:', e);
+    }
+  }
+
   const result = {
-    id: data.id || albumId,
-    title: decodeHtml(data.title || data.name),
-    artist: decodeHtml(data.primary_artists || data.artist || ''),
-    year: data.year,
-    image: getHighResImage(data.image),
+    id: albumData?.id || albumData?.albumid || cleanId,
+    type: 'album',
+    title: decodeHtml(albumData?.title || albumData?.name || searchTitle || 'Album Details'),
+    artist: decodeHtml(albumData?.primary_artists || albumData?.artist || albumData?.singers || ''),
+    year: albumData?.year || '',
+    image: getHighResImage(albumData?.image),
     songs
   };
-  collectionCache.set(`album-${albumId}`, result);
+
+  collectionCache.set(cacheKey, result);
+  if (cleanId) collectionCache.set(`album-${cleanId}`, result);
   return result;
 }
 
@@ -294,11 +371,16 @@ export async function getArtistDetails(artistNameOrId) {
   const cleanName = typeof artistNameOrId === 'string'
     ? artistNameOrId.replace(/feat\..*/i, '').trim()
     : String(artistNameOrId);
+  const lowerName = cleanName.toLowerCase();
 
-  // If input is purely numeric or looks like an ID
+  // 1. Direct ID check
   if (/^\d+$/.test(cleanName)) {
     artistId = cleanName;
+  } else if (POPULAR_ARTISTS_FAST_MAP[lowerName]) {
+    // 2. High-speed fast-path for major popular singers
+    artistId = POPULAR_ARTISTS_FAST_MAP[lowerName];
   } else {
+    // 3. Search query fallback
     try {
       const searchRes = await fetchApi({
         __call: 'search.getArtistResults',
@@ -345,6 +427,16 @@ export async function getArtistDetails(artistNameOrId) {
         }
       }
 
+      // Map albums correctly using JioSaavn's actual keys (albumid, album/title, imageUrl/image)
+      const albums = topAlbumsRaw.map((a) => ({
+        id: a.albumid || a.id,
+        albumid: a.albumid || a.id,
+        type: 'album',
+        title: decodeHtml(a.album || a.title || a.name || 'Album'),
+        year: a.year || '',
+        image: getHighResImage(a.imageUrl || a.image)
+      })).filter((a) => Boolean(a.id));
+
       const result = {
         id: artistId,
         name: decodeHtml(pageData?.name || artistInfo?.name || cleanName),
@@ -354,12 +446,7 @@ export async function getArtistDetails(artistNameOrId) {
         dominantLanguage: pageData?.dominantLanguage || '',
         bio: decodeHtml(pageData?.bio?.[0]?.text || pageData?.bio || `Explore all popular high-resolution tracks and albums by ${cleanName}`),
         songs: allSongs,
-        albums: topAlbumsRaw.map((a) => ({
-          id: a.id,
-          title: decodeHtml(a.title || a.name),
-          year: a.year,
-          image: getHighResImage(a.image)
-        }))
+        albums
       };
 
       // Store in cache for 0ms instant reload
@@ -389,5 +476,39 @@ export async function getArtistDetails(artistNameOrId) {
 
   artistCache.set(cleanKey, fallbackResult);
   return fallbackResult;
+}
+
+// Background prefetch for homepage collections (albums & playlists)
+function prefetchHomepageCollections(homepageData) {
+  if (typeof window === 'undefined') return;
+
+  const prefetchTask = async () => {
+    const items = [
+      ...(homepageData.newAlbums || []).slice(0, 4),
+      ...(homepageData.topPlaylists || []).slice(0, 3)
+    ];
+
+    for (const item of items) {
+      try {
+        if (item.type === 'album') {
+          if (!collectionCache.has(`album-${item.id}`)) {
+            await getAlbumDetails(item.id, item.title);
+          }
+        } else {
+          if (!collectionCache.has(`pl-${item.id}`)) {
+            await getPlaylistDetails(item.id);
+          }
+        }
+      } catch (err) {
+        // Silently ignore prefetch errors
+      }
+    }
+  };
+
+  if ('requestIdleCallback' in window) {
+    window.requestIdleCallback(() => prefetchTask(), { timeout: 3000 });
+  } else {
+    setTimeout(prefetchTask, 1500);
+  }
 }
 

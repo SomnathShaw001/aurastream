@@ -6,7 +6,8 @@ import {
   getPlaylistDetails, 
   getAlbumDetails,
   getArtistDetails,
-  artistCache
+  artistCache,
+  collectionCache
 } from './services/saavnApi';
 import { getLyrics } from './services/lyricsApi';
 import { audioEngine } from './services/audioEngine';
@@ -409,33 +410,81 @@ export default function App() {
     }
   };
 
-  // Open Album / Playlist Details
+  // Open Album / Playlist Details with instant cached switching & optimistic preview
   const handleOpenCollection = async (item) => {
+    if (!item) return;
+
+    const isAlbum = item.type === 'album' || Boolean(item.albumid) || Boolean(item.year) || item.isAlbum;
+    const targetId = String(item.albumid || item.id || '').trim();
+    const cacheKey = isAlbum ? `album-${targetId || item.title}` : `pl-${targetId}`;
+
+    // 1. Instant switch if already cached (0ms delay)
+    if (collectionCache.has(cacheKey)) {
+      const cached = collectionCache.get(cacheKey);
+      const data = {
+        type: isAlbum ? 'album' : 'playlist',
+        title: cached.title,
+        subtitle: isAlbum ? `${cached.artist || ''} • ${cached.year || ''}` : cached.subtitle,
+        image: cached.image || item.image,
+        songs: cached.songs || []
+      };
+      setViewDetails(data);
+      pushNavigation('details', data);
+      return;
+    }
+
+    // 2. Optimistic instant navigation: Switch view immediately with title & cover art
+    const previewData = {
+      type: isAlbum ? 'album' : 'playlist',
+      title: item.title || 'Loading...',
+      subtitle: item.subtitle || (isAlbum ? 'Studio Album' : 'Featured Playlist'),
+      image: item.image,
+      songs: []
+    };
+    setViewDetails(previewData);
+    pushNavigation('details', previewData);
     setIsLoading(true);
+
     try {
-      if (item.type === 'album' || item.albumid) {
-        const albumData = await getAlbumDetails(item.id);
-        const data = {
-          type: 'album',
-          title: albumData.title,
-          subtitle: `${albumData.artist} • ${albumData.year || ''}`,
-          image: albumData.image,
-          songs: albumData.songs
-        };
-        setViewDetails(data);
-        pushNavigation('details', data);
+      let resolvedData = null;
+
+      if (isAlbum) {
+        resolvedData = await getAlbumDetails(targetId, item.title);
+        // If album returned empty tracks, try playlist endpoint as fallback
+        if ((!resolvedData.songs || resolvedData.songs.length === 0) && targetId) {
+          try {
+            const plTry = await getPlaylistDetails(targetId);
+            if (plTry.songs && plTry.songs.length > 0) {
+              resolvedData = { ...resolvedData, songs: plTry.songs };
+            }
+          } catch (e) {
+            // ignore
+          }
+        }
       } else {
-        const playlistData = await getPlaylistDetails(item.id);
-        const data = {
-          type: 'playlist',
-          title: playlistData.title,
-          subtitle: playlistData.subtitle,
-          image: playlistData.image,
-          songs: playlistData.songs
-        };
-        setViewDetails(data);
-        pushNavigation('details', data);
+        resolvedData = await getPlaylistDetails(targetId);
+        // If playlist returned empty tracks, try album endpoint as fallback
+        if ((!resolvedData.songs || resolvedData.songs.length === 0) && targetId) {
+          try {
+            const albTry = await getAlbumDetails(targetId, item.title);
+            if (albTry.songs && albTry.songs.length > 0) {
+              resolvedData = { ...resolvedData, songs: albTry.songs, type: 'album' };
+            }
+          } catch (e) {
+            // ignore
+          }
+        }
       }
+
+      const fullData = {
+        type: resolvedData.type || (isAlbum ? 'album' : 'playlist'),
+        title: resolvedData.title || item.title,
+        subtitle: resolvedData.subtitle || (resolvedData.artist ? `${resolvedData.artist} • ${resolvedData.year || ''}` : item.subtitle),
+        image: resolvedData.image || item.image,
+        songs: resolvedData.songs || []
+      };
+
+      setViewDetails(fullData);
     } catch (e) {
       console.error('Failed to open collection:', e);
       handleSearch(item.title);

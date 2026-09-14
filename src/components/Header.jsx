@@ -93,7 +93,7 @@ export default function Header({
     { id: 'lime', name: 'Cyber Lime (Image 5)', color: '#b8ea24' },
     { id: 'crimson', name: 'Crimson Red (Image 4)', color: '#ff334b' },
     { id: 'burgundy', name: 'Burgundy & Cream (Image 2)', color: '#f5ebd7' },
-    { id: 'obsidian', name: 'Obsidian Violet', color: '#8b5cf6' }
+    { id: 'obsidian', name: 'Obsidian Emerald', color: '#10b981' }
   ];
 
   const hasSuggestions = suggestions.songs.length > 0 || suggestions.albums.length > 0 || suggestions.artists.length > 0;
@@ -261,7 +261,7 @@ export default function Header({
           <button 
             className="theme-badge-btn" 
             onClick={() => setIsThemeMenuOpen(!isThemeMenuOpen)}
-            title="Switch UI Theme (Lime, Crimson, Burgundy, Violet)"
+            title="Switch UI Theme (Lime, Crimson, Burgundy, Emerald)"
           >
             <Palette size={15} />
             <span style={{ textTransform: 'capitalize' }}>{currentTheme}</span>
