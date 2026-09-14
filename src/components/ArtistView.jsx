@@ -74,7 +74,7 @@ export default function ArtistView({
                 onClick={() => onPlayAll(artist.songs)}
                 disabled={!artist.songs || artist.songs.length === 0}
               >
-                <Play size={18} fill="#ffffff" />
+                <Play size={18} fill="#000000" />
                 <span>Play Discography</span>
               </button>
             </div>
@@ -86,22 +86,29 @@ export default function ArtistView({
       <div style={{ marginTop: 36 }}>
         <div className="section-header">
           <h2 className="section-title">
-            <Sparkles size={20} color="var(--accent-cyan)" />
+            <Sparkles size={20} color="var(--theme-accent, #10b981)" />
             Popular Tracks
           </h2>
           <span className="section-subtitle">Stream in Studio Quality (320 kbps)</span>
         </div>
 
-        <TrackList
-          tracks={artist.songs || []}
-          currentTrack={currentTrack}
-          isPlaying={isPlaying}
-          onPlayTrack={onPlayTrack}
-          likedTrackIds={likedTrackIds}
-          onToggleLike={onToggleLike}
-          onAddToPlaylist={onAddToPlaylist}
-          onDownloadTrack={onDownloadTrack}
-        />
+        {artist.isLoading && (!artist.songs || artist.songs.length === 0) ? (
+          <div style={{ padding: '60px 0', textAlign: 'center', color: 'var(--text-muted)' }}>
+            <div className="loading-spinner" style={{ margin: '0 auto 14px' }} />
+            <p style={{ fontSize: 14 }}>Fetching discography & top tracks...</p>
+          </div>
+        ) : (
+          <TrackList
+            tracks={artist.songs || []}
+            currentTrack={currentTrack}
+            isPlaying={isPlaying}
+            onPlayTrack={onPlayTrack}
+            likedTrackIds={likedTrackIds}
+            onToggleLike={onToggleLike}
+            onAddToPlaylist={onAddToPlaylist}
+            onDownloadTrack={onDownloadTrack}
+          />
+        )}
       </div>
 
       {/* Albums & Discography (if any) */}
@@ -126,7 +133,7 @@ export default function ArtistView({
                   <img src={album.image} alt={album.title} className="card-cover" loading="lazy" />
                   <div className="card-badge">ALBUM</div>
                   <button className="card-play-btn" title="View Album">
-                    <Play size={20} fill="#ffffff" style={{ marginLeft: 2 }} />
+                    <Play size={20} fill="#000000" style={{ marginLeft: 2 }} />
                   </button>
                 </div>
                 <div className="card-title" title={album.title}>

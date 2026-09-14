@@ -119,7 +119,7 @@ export default function Sidebar({
             key={art.name}
             className="dock-avatar-btn"
             onClick={() => {
-              if (onSelectArtist) onSelectArtist(art.name);
+              if (onSelectArtist) onSelectArtist(art.name, art.image);
             }}
             title={`Singer: ${art.name}`}
           >

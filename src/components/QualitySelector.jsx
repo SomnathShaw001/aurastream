@@ -59,21 +59,21 @@ export default function QualitySelector({ currentBitrate, onSelectBitrate, onClo
                   gap: 16,
                   padding: '16px',
                   borderRadius: '14px',
-                  background: isSelected ? 'rgba(139, 92, 246, 0.15)' : 'rgba(255, 255, 255, 0.04)',
-                  border: isSelected ? '1px solid var(--accent-primary)' : '1px solid var(--border-subtle)',
+                  background: isSelected ? 'rgba(255, 255, 255, 0.08)' : 'rgba(255, 255, 255, 0.03)',
+                  border: isSelected ? '1px solid var(--theme-accent, #10b981)' : '1px solid var(--border-subtle)',
                   cursor: 'pointer',
-                  transition: 'all 0.2s ease'
+                  transition: 'all 0.15s ease'
                 }}
               >
                 <div style={{
                   width: 40,
                   height: 40,
                   borderRadius: '10px',
-                  background: isSelected ? 'var(--accent-primary)' : 'rgba(255,255,255,0.06)',
+                  background: isSelected ? 'var(--theme-accent, #10b981)' : 'rgba(255,255,255,0.06)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  color: '#ffffff'
+                  color: isSelected ? '#000000' : 'var(--text-muted)'
                 }}>
                   <Icon size={20} />
                 </div>

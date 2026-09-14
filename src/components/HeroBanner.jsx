@@ -36,7 +36,7 @@ export default function HeroBanner({ featuredTrack, onPlay, onSelectArtist }) {
           </p>
           <div className="hero-actions">
             <button className="btn-primary" onClick={() => onPlay(featuredTrack)}>
-              <Play size={18} fill="#ffffff" />
+              <Play size={18} fill="#000000" />
               <span>Stream in Hi-Res</span>
             </button>
           </div>

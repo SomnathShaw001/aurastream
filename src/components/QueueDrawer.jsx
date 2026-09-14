@@ -50,8 +50,8 @@ export default function QueueDrawer({
         {/* Current track highlighted */}
         {currentTrack && (
           <div style={{
-            background: 'rgba(139, 92, 246, 0.12)',
-            border: '1px solid rgba(139, 92, 246, 0.3)',
+            background: 'rgba(255, 255, 255, 0.06)',
+            border: '1px solid var(--theme-accent, #10b981)',
             borderRadius: '12px',
             padding: '10px 14px',
             marginBottom: 16,

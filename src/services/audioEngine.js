@@ -308,22 +308,57 @@ class AudioEngine {
     }
   }
 
-  // One-click offline download of 320kbps MP4/AAC
-  downloadCurrentTrack() {
-    if (!this.currentTrack) return;
-    const url = this.currentTrack.audioStreams?.['320'] || this.audio.src;
-    if (!url) return;
+  // Direct offline download of song as MP3 in current streaming quality (same tab, no popups)
+  async downloadTrack(track = this.currentTrack, bitrate = this.bitrate) {
+    const targetTrack = track || this.currentTrack;
+    if (!targetTrack) return;
 
-    const safeFilename = `${this.currentTrack.artist} - ${this.currentTrack.title} [320kbps].m4a`
-      .replace(/[\\/:*?"<>|]/g, '_');
+    const streamBitrate = bitrate || this.bitrate || '320';
+    const url = targetTrack.audioStreams?.[streamBitrate] ||
+                targetTrack.audioStreams?.['320'] ||
+                targetTrack.audioStreams?.['160'] ||
+                targetTrack.audioStreams?.['96'] ||
+                this.audio?.src;
 
-    const anchor = document.createElement('a');
-    anchor.href = url;
-    anchor.download = safeFilename;
-    anchor.target = '_blank';
-    document.body.appendChild(anchor);
-    anchor.click();
-    document.body.removeChild(anchor);
+    if (!url) {
+      console.warn('No audio stream available to download');
+      return;
+    }
+
+    const cleanArtist = (targetTrack.artist || 'Unknown Artist').replace(/[\\/:*?"<>|]/g, '_').trim();
+    const cleanTitle = (targetTrack.title || 'Track').replace(/[\\/:*?"<>|]/g, '_').trim();
+    const safeFilename = `${cleanArtist} - ${cleanTitle} [${streamBitrate}kbps].mp3`;
+
+    try {
+      // Fetch audio data and create a Blob URL for instant direct download in the same tab
+      const response = await fetch(url);
+      if (!response.ok) throw new Error(`HTTP error ${response.status}`);
+      const blob = await response.blob();
+      const blobUrl = URL.createObjectURL(blob);
+
+      const anchor = document.createElement('a');
+      anchor.href = blobUrl;
+      anchor.download = safeFilename;
+      anchor.style.display = 'none';
+      document.body.appendChild(anchor);
+      anchor.click();
+      document.body.removeChild(anchor);
+
+      setTimeout(() => URL.revokeObjectURL(blobUrl), 15000);
+    } catch (err) {
+      console.warn('Direct blob download failed, triggering fallback download:', err);
+      const anchor = document.createElement('a');
+      anchor.href = url;
+      anchor.download = safeFilename;
+      anchor.style.display = 'none';
+      document.body.appendChild(anchor);
+      anchor.click();
+      document.body.removeChild(anchor);
+    }
+  }
+
+  downloadCurrentTrack(bitrate = this.bitrate) {
+    return this.downloadTrack(this.currentTrack, bitrate);
   }
 }
 

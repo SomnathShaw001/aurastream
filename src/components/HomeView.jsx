@@ -42,7 +42,7 @@ export default function HomeView({
             <p className="liked-card-count">{likedCount} liked songs</p>
           </div>
           <button className="card-play-btn floating-play-btn" title="Play Liked Songs">
-            <Play size={22} fill="#ffffff" style={{ marginLeft: 2 }} />
+            <Play size={22} fill="#000000" style={{ marginLeft: 2 }} />
           </button>
         </div>
 
@@ -67,7 +67,7 @@ export default function HomeView({
               <span className="quick-pl-sub">{item.subtitle}</span>
             </div>
             <button className="card-play-btn" style={{ position: 'static', opacity: 1, transform: 'none', width: 38, height: 38 }}>
-              <Play size={18} fill="#ffffff" style={{ marginLeft: 2 }} />
+              <Play size={18} fill="#000000" style={{ marginLeft: 2 }} />
             </button>
           </div>
         ))}
@@ -115,7 +115,7 @@ export default function HomeView({
               <div 
                 key={artist.name} 
                 className="artist-circle-card"
-                onClick={() => onSelectArtist(artist.name)}
+                onClick={() => onSelectArtist(artist.name, artist.image)}
                 title={`Open ${artist.name}'s page`}
               >
                 <div className="artist-circle-img-wrap">
@@ -125,11 +125,11 @@ export default function HomeView({
                     className="artist-circle-img"
                     onError={(e) => {
                       e.currentTarget.onerror = null;
-                      e.currentTarget.src = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100"><defs><linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="%238b5cf6"/><stop offset="100%" stop-color="%2306b6d4"/></linearGradient></defs><circle cx="50" cy="50" r="50" fill="url(%23g)"/><text x="50" y="58" font-family="sans-serif" font-size="34" font-weight="bold" fill="white" text-anchor="middle">${encodeURIComponent(artist.name[0])}</text></svg>`;
+                      e.currentTarget.src = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100"><defs><linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="%2310b981"/><stop offset="100%" stop-color="%2306b6d4"/></linearGradient></defs><circle cx="50" cy="50" r="50" fill="url(%23g)"/><text x="50" y="58" font-family="sans-serif" font-size="34" font-weight="bold" fill="white" text-anchor="middle">${encodeURIComponent(artist.name[0])}</text></svg>`;
                     }}
                   />
                   <div className="artist-hover-play">
-                    <Play size={20} fill="#ffffff" style={{ marginLeft: 2 }} />
+                    <Play size={20} fill="#000000" style={{ marginLeft: 2 }} />
                   </div>
                 </div>
                 <div className="artist-circle-name">{artist.name}</div>

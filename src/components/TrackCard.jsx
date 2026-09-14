@@ -35,9 +35,9 @@ export default function TrackCard({
           title={isCurrent && isPlaying ? 'Pause' : 'Play'}
         >
           {isCurrent && isPlaying ? (
-            <Pause size={20} fill="#ffffff" />
+            <Pause size={20} fill="#000000" />
           ) : (
-            <Play size={20} fill="#ffffff" style={{ marginLeft: 2 }} />
+            <Play size={20} fill="#000000" style={{ marginLeft: 2 }} />
           )}
         </button>
       </div>

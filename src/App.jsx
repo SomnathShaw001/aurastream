@@ -5,7 +5,8 @@ import {
   getSongDetails, 
   getPlaylistDetails, 
   getAlbumDetails,
-  getArtistDetails
+  getArtistDetails,
+  artistCache
 } from './services/saavnApi';
 import { getLyrics } from './services/lyricsApi';
 import { audioEngine } from './services/audioEngine';
@@ -443,20 +444,54 @@ export default function App() {
     }
   };
 
-  // Open Singer / Artist Details
-  const handleSelectArtist = async (artistNameOrId) => {
+  // Open Singer / Artist Details with 0-delay instant navigation and background loading
+  const handleSelectArtist = (artistNameOrId, initialImage = null) => {
     if (!artistNameOrId) return;
-    setIsLoading(true);
-    try {
-      const data = await getArtistDetails(artistNameOrId);
-      setArtistDetails(data);
-      pushNavigation('artist', data);
-    } catch (e) {
-      console.error('Failed to load artist details:', e);
-      handleSearch(artistNameOrId);
-    } finally {
-      setIsLoading(false);
+    const cleanName = typeof artistNameOrId === 'string'
+      ? artistNameOrId.replace(/feat\..*/i, '').trim()
+      : String(artistNameOrId);
+    const cleanKey = cleanName.toLowerCase();
+
+    // 1. If in cache, switch view instantly with complete data (0ms delay)
+    if (artistCache.has(cleanKey)) {
+      const cached = artistCache.get(cleanKey);
+      setArtistDetails(cached);
+      pushNavigation('artist', cached);
+      return;
     }
+
+    // 2. Optimistic instant navigation: Switch view immediately with preview banner
+    const previewData = {
+      id: cleanName,
+      name: cleanName,
+      image: initialImage || 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=500&q=80',
+      followerCount: 'Verified Artist',
+      isVerified: true,
+      bio: `Top tracks and discography by ${cleanName}`,
+      songs: [],
+      albums: [],
+      isLoading: true
+    };
+    setArtistDetails(previewData);
+    pushNavigation('artist', previewData);
+
+    // 3. Fetch full details in background without freezing the UI
+    getArtistDetails(artistNameOrId)
+      .then((data) => {
+        if (data) {
+          setArtistDetails(data);
+          setNavHistory((prev) => {
+            const updated = [...prev];
+            if (updated.length > 0 && updated[updated.length - 1]?.tab === 'artist') {
+              updated[updated.length - 1] = { tab: 'artist', data };
+            }
+            return updated;
+          });
+        }
+      })
+      .catch((e) => {
+        console.error('Failed to load artist details:', e);
+      });
   };
 
   // Custom Playlists Operations
@@ -616,7 +651,7 @@ export default function App() {
                   onAddToPlaylist={(track) => {
                     setPlaylistModalConfig({ isOpen: true, mode: 'add_track', track });
                   }}
-                  onDownloadTrack={() => audioEngine.downloadCurrentTrack()}
+                  onDownloadTrack={(track) => audioEngine.downloadTrack(track, bitrate)}
                 />
               </div>
             )}
@@ -643,7 +678,7 @@ export default function App() {
                   onAddToPlaylist={(track) => {
                     setPlaylistModalConfig({ isOpen: true, mode: 'add_track', track });
                   }}
-                  onDownloadTrack={() => audioEngine.downloadCurrentTrack()}
+                  onDownloadTrack={(track) => audioEngine.downloadTrack(track, bitrate)}
                 />
               </div>
             )}
@@ -670,7 +705,7 @@ export default function App() {
                   onAddToPlaylist={(track) => {
                     setPlaylistModalConfig({ isOpen: true, mode: 'add_track', track });
                   }}
-                  onDownloadTrack={() => audioEngine.downloadCurrentTrack()}
+                  onDownloadTrack={(track) => audioEngine.downloadTrack(track, bitrate)}
                 />
               </div>
             )}
@@ -697,7 +732,7 @@ export default function App() {
                   onAddToPlaylist={(track) => {
                     setPlaylistModalConfig({ isOpen: true, mode: 'add_track', track });
                   }}
-                  onDownloadTrack={() => audioEngine.downloadCurrentTrack()}
+                  onDownloadTrack={(track) => audioEngine.downloadTrack(track, bitrate)}
                 />
               </div>
             )}
@@ -729,7 +764,7 @@ export default function App() {
                   onAddToPlaylist={(track) => {
                     setPlaylistModalConfig({ isOpen: true, mode: 'add_track', track });
                   }}
-                  onDownloadTrack={() => audioEngine.downloadCurrentTrack()}
+                  onDownloadTrack={(track) => audioEngine.downloadTrack(track, bitrate)}
                 />
               </div>
             )}
@@ -761,7 +796,7 @@ export default function App() {
                   onAddToPlaylist={(track) => {
                     setPlaylistModalConfig({ isOpen: true, mode: 'add_track', track });
                   }}
-                  onDownloadTrack={() => audioEngine.downloadCurrentTrack()}
+                  onDownloadTrack={(track) => audioEngine.downloadTrack(track, bitrate)}
                 />
               </div>
             )}
@@ -784,7 +819,7 @@ export default function App() {
                 onAddToPlaylist={(track) => {
                   setPlaylistModalConfig({ isOpen: true, mode: 'add_track', track });
                 }}
-                onDownloadTrack={() => audioEngine.downloadCurrentTrack()}
+                onDownloadTrack={(track) => audioEngine.downloadTrack(track, bitrate)}
               />
             )}
           </div>
@@ -844,7 +879,7 @@ export default function App() {
         onOpenEqModal={() => setIsEqOpen(true)}
         onToggleQueue={() => setIsQueueOpen(!isQueueOpen)}
         isQueueOpen={isQueueOpen}
-        onDownload={() => audioEngine.downloadCurrentTrack()}
+        onDownload={() => audioEngine.downloadTrack(currentTrack, bitrate)}
         onSelectArtist={handleSelectArtist}
       />
 

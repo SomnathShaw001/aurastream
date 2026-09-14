@@ -221,8 +221,16 @@ export async function getSongDetails(songId) {
   return formatSong(rawSong);
 }
 
+// In-memory caches for instantaneous, 0-latency navigation
+export const artistCache = new Map();
+export const collectionCache = new Map();
+
 // Playlist details & tracks
 export async function getPlaylistDetails(listId) {
+  if (collectionCache.has(`pl-${listId}`)) {
+    return collectionCache.get(`pl-${listId}`);
+  }
+
   const data = await fetchApi({
     __call: 'playlist.getDetails',
     _format: 'json',
@@ -232,17 +240,23 @@ export async function getPlaylistDetails(listId) {
   });
 
   const songs = (data.songs || data.list || []).map(formatSong).filter(Boolean);
-  return {
+  const result = {
     id: data.id || listId,
     title: decodeHtml(data.title || data.listname),
     subtitle: decodeHtml(data.subtitle || `${songs.length} songs`),
     image: getHighResImage(data.image),
     songs
   };
+  collectionCache.set(`pl-${listId}`, result);
+  return result;
 }
 
 // Album details & tracks
 export async function getAlbumDetails(albumId) {
+  if (collectionCache.has(`album-${albumId}`)) {
+    return collectionCache.get(`album-${albumId}`);
+  }
+
   const data = await fetchApi({
     __call: 'content.getAlbumDetails',
     _format: 'json',
@@ -252,7 +266,7 @@ export async function getAlbumDetails(albumId) {
   });
 
   const songs = (data.songs || data.list || []).map(formatSong).filter(Boolean);
-  return {
+  const result = {
     id: data.id || albumId,
     title: decodeHtml(data.title || data.name),
     artist: decodeHtml(data.primary_artists || data.artist || ''),
@@ -260,10 +274,20 @@ export async function getAlbumDetails(albumId) {
     image: getHighResImage(data.image),
     songs
   };
+  collectionCache.set(`album-${albumId}`, result);
+  return result;
 }
 
 // Artist details & full songs/discography
 export async function getArtistDetails(artistNameOrId) {
+  if (!artistNameOrId) return null;
+  const cleanKey = String(artistNameOrId).toLowerCase().trim();
+
+  // Instant response if already cached
+  if (artistCache.has(cleanKey)) {
+    return artistCache.get(cleanKey);
+  }
+
   let artistId = null;
   let artistInfo = null;
 
@@ -295,28 +319,23 @@ export async function getArtistDetails(artistNameOrId) {
     }
   }
 
-  // If artist ID found, get full artist page
+  // If artist ID found, get full artist page and search songs concurrently
   if (artistId) {
     try {
-      const pageData = await fetchApi({
-        __call: 'artist.getArtistPageDetails',
-        _format: 'json',
-        cc: 'in',
-        _marker: '0',
-        artistId
-      });
+      const [pageData, moreRes] = await Promise.all([
+        fetchApi({
+          __call: 'artist.getArtistPageDetails',
+          _format: 'json',
+          cc: 'in',
+          _marker: '0',
+          artistId
+        }),
+        searchSongs(cleanName, 1, 30).catch(() => ({ songs: [] }))
+      ]);
 
-      const topSongsRaw = pageData.topSongs?.songs || pageData.topSongs || [];
-      const topAlbumsRaw = pageData.topAlbums?.albums || pageData.topAlbums || [];
-
-      // Extended discography search
-      let moreSongs = [];
-      try {
-        const moreRes = await searchSongs(pageData.name || cleanName, 1, 30);
-        moreSongs = moreRes.songs || [];
-      } catch (err) {
-        // ignore
-      }
+      const topSongsRaw = pageData?.topSongs?.songs || pageData?.topSongs || [];
+      const topAlbumsRaw = pageData?.topAlbums?.albums || pageData?.topAlbums || [];
+      const moreSongs = moreRes?.songs || [];
 
       // Merge and deduplicate
       const allSongs = [...topSongsRaw.map(formatSong).filter(Boolean)];
@@ -326,14 +345,14 @@ export async function getArtistDetails(artistNameOrId) {
         }
       }
 
-      return {
+      const result = {
         id: artistId,
-        name: decodeHtml(pageData.name || artistInfo?.name || cleanName),
-        image: getHighResImage(pageData.image || artistInfo?.image),
-        followerCount: pageData.follower_count || pageData.fan_count || '1.2M',
-        isVerified: pageData.isVerified === 'true' || pageData.isVerified === true || true,
-        dominantLanguage: pageData.dominantLanguage || '',
-        bio: decodeHtml(pageData.bio?.[0]?.text || pageData.bio || `Explore all popular high-resolution tracks and albums by ${cleanName}`),
+        name: decodeHtml(pageData?.name || artistInfo?.name || cleanName),
+        image: getHighResImage(pageData?.image || artistInfo?.image),
+        followerCount: pageData?.follower_count || pageData?.fan_count || '1.2M',
+        isVerified: true,
+        dominantLanguage: pageData?.dominantLanguage || '',
+        bio: decodeHtml(pageData?.bio?.[0]?.text || pageData?.bio || `Explore all popular high-resolution tracks and albums by ${cleanName}`),
         songs: allSongs,
         albums: topAlbumsRaw.map((a) => ({
           id: a.id,
@@ -342,6 +361,13 @@ export async function getArtistDetails(artistNameOrId) {
           image: getHighResImage(a.image)
         }))
       };
+
+      // Store in cache for 0ms instant reload
+      artistCache.set(cleanKey, result);
+      if (result.id) artistCache.set(String(result.id).toLowerCase(), result);
+      if (result.name) artistCache.set(result.name.toLowerCase().trim(), result);
+
+      return result;
     } catch (err) {
       console.warn('Artist page fetch failed, falling back:', err);
     }
@@ -349,7 +375,7 @@ export async function getArtistDetails(artistNameOrId) {
 
   // Fallback: search songs by artist name
   const fallbackSongs = await searchSongs(cleanName, 1, 30);
-  return {
+  const fallbackResult = {
     id: cleanName,
     name: cleanName,
     image: fallbackSongs.songs[0]?.image || 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=500&q=80',
@@ -360,5 +386,8 @@ export async function getArtistDetails(artistNameOrId) {
     songs: fallbackSongs.songs,
     albums: []
   };
+
+  artistCache.set(cleanKey, fallbackResult);
+  return fallbackResult;
 }
 
