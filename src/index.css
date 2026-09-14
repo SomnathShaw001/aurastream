@@ -2372,3 +2372,132 @@ body {
   margin-top: 4px;
 }
 
+/* 9. About AuraStream Modal */
+.about-modal-card {
+  max-width: 520px;
+  background: var(--bg-surface-elevated);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+}
+
+.about-brand-wrap {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.about-logo-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: var(--theme-accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
+}
+
+.about-modal-body {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.about-tagline {
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--theme-text-muted);
+}
+
+.about-specialties-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.about-specialty-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 10px 14px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  transition: all var(--transition-fast);
+}
+
+.about-specialty-item:hover {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.specialty-icon-box {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.specialty-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.specialty-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--theme-text-main);
+}
+
+.specialty-desc {
+  font-size: 11px;
+  color: var(--theme-text-muted);
+  line-height: 1.4;
+}
+
+.about-links-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.about-link-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 700;
+  text-decoration: none;
+  transition: all var(--transition-fast);
+}
+
+.about-link-btn.primary {
+  background: var(--theme-accent);
+  color: #000000;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
+}
+
+.about-link-btn.primary:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.1);
+}
+
+.about-link-btn.secondary {
+  background: rgba(255, 255, 255, 0.06);
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.about-link-btn.secondary:hover {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+

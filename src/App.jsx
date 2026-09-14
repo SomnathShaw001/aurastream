@@ -32,6 +32,7 @@ import QualitySelector from './components/QualitySelector';
 import QueueDrawer from './components/QueueDrawer';
 import PlaylistModal from './components/PlaylistModal';
 import ArtistView from './components/ArtistView';
+import AboutModal from './components/AboutModal';
 
 import { Sparkles, TrendingUp, Music, ListMusic, Heart, Radio, Disc3, Disc, Music2 } from 'lucide-react';
 
@@ -95,6 +96,7 @@ export default function App() {
   const [isEqOpen, setIsEqOpen] = useState(false);
   const [isQualityOpen, setIsQualityOpen] = useState(false);
   const [isQueueOpen, setIsQueueOpen] = useState(false);
+  const [isAboutOpen, setIsAboutOpen] = useState(false);
   const [playlistModalConfig, setPlaylistModalConfig] = useState({
     isOpen: false,
     mode: 'create',
@@ -570,6 +572,7 @@ export default function App() {
             bitrate={bitrate}
             openQualityModal={() => setIsQualityOpen(true)}
             openEqModal={() => setIsEqOpen(true)}
+            openAboutModal={() => setIsAboutOpen(true)}
             currentTheme={theme}
             onSelectTheme={(th) => setTheme(th)}
           />
@@ -911,6 +914,11 @@ export default function App() {
           onAddTrackToPlaylist={handleAddTrackToPlaylist}
           onClose={() => setPlaylistModalConfig({ isOpen: false, mode: 'create', track: null })}
         />
+      )}
+
+      {/* About App Modal */}
+      {isAboutOpen && (
+        <AboutModal onClose={() => setIsAboutOpen(false)} />
       )}
     </div>
   );

@@ -8,7 +8,8 @@ import {
   Sliders, 
   ShieldCheck, 
   User,
-  Music
+  Music,
+  Info
 } from 'lucide-react';
 import { getAutocomplete } from '../services/saavnApi';
 
@@ -24,6 +25,7 @@ export default function Header({
   bitrate, 
   openQualityModal,
   openEqModal,
+  openAboutModal,
   currentTheme,
   onSelectTheme
 }) {
@@ -306,8 +308,22 @@ export default function Header({
           <Sliders size={18} />
         </button>
 
+        {/* About App Modal Trigger */}
+        <button 
+          className="icon-btn" 
+          onClick={openAboutModal}
+          title="About AuraStream Specialties & Links"
+        >
+          <Info size={18} />
+        </button>
+
         {/* User Profile Avatar */}
-        <div className="user-avatar-circle" title="AuraStream Member">
+        <div 
+          className="user-avatar-circle" 
+          onClick={openAboutModal}
+          title="About AuraStream"
+          style={{ cursor: 'pointer' }}
+        >
           <User size={16} />
         </div>
       </div>

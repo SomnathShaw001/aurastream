@@ -17,6 +17,19 @@
 
 ---
 
+## 📖 About AuraStream
+
+AuraStream is an audiophile-grade high-resolution web music streaming application engineered for uncompromised sound fidelity and modern desktop aesthetics:
+
+1. **Lossless 320 kbps Studio Master Audio**: Decrypts and streams studio-quality 320 kbps AAC/MP4 audio on the fly from an 80M+ global music catalog with zero compression artifacts.
+2. **Hardware-Grade Web Audio Sculpting**: Features a 10-band interactive equalizer with studio presets and 60FPS reactive canvas spectrum visualizers (neon bars, oscilloscope, radial pulse).
+3. **Synchronized Karaoke Lyrics & MediaSession**: Real-time line-by-line scrolling LRC lyrics with interactive tap-to-seek, paired with native OS lockscreen and media-key playback controls.
+4. **Spicetify Aesthetics & Artist Discography**: Tailored desktop audio chassis with customizable bezel themes (Cyber Lime, Crimson Red, Burgundy & Cream, Obsidian) and dedicated singer discography pages.
+
+🔗 **Launch App**: [https://auramusic-stream.vercel.app](https://auramusic-stream.vercel.app)
+
+---
+
 ## ✨ Features
 
 - 💎 **True 320 kbps Studio Quality Streaming**: Decrypts and streams high-bitrate studio audio streams from JioSaavn's 80M+ global music catalog on the fly, with selectable quality tiers (`320 kbps Studio Master`, `160 kbps High`, `96 kbps Data Saver`).
