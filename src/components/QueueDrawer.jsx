@@ -1,5 +1,6 @@
 import React from 'react';
 import { X, Trash2, Music, Play } from 'lucide-react';
+import ArtistLinks from './ArtistLinks';
 
 export default function QueueDrawer({ 
   queue, 
@@ -7,7 +8,8 @@ export default function QueueDrawer({
   onPlayTrack, 
   onRemoveFromQueue, 
   onClearQueue, 
-  onClose 
+  onClose,
+  onSelectArtist
 }) {
   return (
     <div className="overlay-backdrop" onClick={onClose}>
@@ -70,7 +72,13 @@ export default function QueueDrawer({
                 {currentTrack.title}
               </div>
               <div style={{ fontSize: '12px', color: 'var(--text-muted)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                {currentTrack.artist}
+                <ArtistLinks 
+                  artistsString={currentTrack.artist} 
+                  onSelectArtist={(artist) => {
+                    onClose();
+                    if (onSelectArtist) onSelectArtist(artist);
+                  }} 
+                />
               </div>
             </div>
             <div className="hires-tag">320K</div>
@@ -112,7 +120,13 @@ export default function QueueDrawer({
                     {track.title}
                   </div>
                   <div style={{ fontSize: '11px', color: 'var(--text-muted)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                    {track.artist}
+                    <ArtistLinks 
+                      artistsString={track.artist} 
+                      onSelectArtist={(artist) => {
+                        onClose();
+                        if (onSelectArtist) onSelectArtist(artist);
+                      }} 
+                    />
                   </div>
                 </div>
 

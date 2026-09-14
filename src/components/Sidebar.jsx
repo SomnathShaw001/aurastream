@@ -27,11 +27,9 @@ export default function Sidebar({
         <div className="logo-icon">
           <Music2 size={22} color="#ffffff" />
         </div>
-        <div>
-          <div className="logo-text">
-            AuraStream
-            <span className="hires-tag">HI-RES</span>
-          </div>
+        <div className="brand-title-wrap">
+          <span className="logo-text">AuraStream</span>
+          <span className="hires-tag">HI-RES</span>
         </div>
       </div>
 

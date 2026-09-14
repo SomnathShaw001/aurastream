@@ -1,5 +1,6 @@
 import React from 'react';
 import { Play, Pause, Heart, MoreVertical, Plus } from 'lucide-react';
+import ArtistLinks from './ArtistLinks';
 
 export default function TrackCard({ 
   item, 
@@ -8,7 +9,8 @@ export default function TrackCard({
   onPlay, 
   isLiked, 
   onToggleLike,
-  onAddToPlaylist 
+  onAddToPlaylist,
+  onSelectArtist
 }) {
   return (
     <div className="track-card" onClick={() => onPlay(item)}>
@@ -46,7 +48,11 @@ export default function TrackCard({
             {item.title}
           </div>
           <div className="card-artist" title={item.artist || item.subtitle}>
-            {item.artist || item.subtitle}
+            {item.artist ? (
+              <ArtistLinks artistsString={item.artist} onSelectArtist={onSelectArtist} />
+            ) : (
+              item.subtitle
+            )}
           </div>
         </div>
 

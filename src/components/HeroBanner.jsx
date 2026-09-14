@@ -1,7 +1,8 @@
 import React from 'react';
 import { Play, Sparkles, Music, Radio } from 'lucide-react';
+import ArtistLinks from './ArtistLinks';
 
-export default function HeroBanner({ featuredTrack, onPlay }) {
+export default function HeroBanner({ featuredTrack, onPlay, onSelectArtist }) {
   if (!featuredTrack) return null;
 
   return (
@@ -27,7 +28,11 @@ export default function HeroBanner({ featuredTrack, onPlay }) {
           </div>
           <h1 className="hero-title">{featuredTrack.title}</h1>
           <p className="hero-subtitle">
-            {featuredTrack.subtitle || featuredTrack.artist || 'Experience high fidelity audio streaming'}
+            {featuredTrack.artist ? (
+              <ArtistLinks artistsString={featuredTrack.artist} onSelectArtist={onSelectArtist} />
+            ) : (
+              featuredTrack.subtitle || 'Experience high fidelity audio streaming'
+            )}
           </p>
           <div className="hero-actions">
             <button className="btn-primary" onClick={() => onPlay(featuredTrack)}>

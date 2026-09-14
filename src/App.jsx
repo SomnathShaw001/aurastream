@@ -4,7 +4,8 @@ import {
   searchSongs, 
   getSongDetails, 
   getPlaylistDetails, 
-  getAlbumDetails 
+  getAlbumDetails,
+  getArtistDetails
 } from './services/saavnApi';
 import { getLyrics } from './services/lyricsApi';
 import { audioEngine } from './services/audioEngine';
@@ -31,6 +32,7 @@ import EqualizerModal from './components/EqualizerModal';
 import QualitySelector from './components/QualitySelector';
 import QueueDrawer from './components/QueueDrawer';
 import PlaylistModal from './components/PlaylistModal';
+import ArtistView from './components/ArtistView';
 
 import { Sparkles, TrendingUp, Music, ListMusic, Heart, Radio, Disc3, Disc } from 'lucide-react';
 
@@ -39,6 +41,7 @@ export default function App() {
   const [activeTab, setActiveTab] = useState('home');
   const [selectedPlaylist, setSelectedPlaylist] = useState(null);
   const [viewDetails, setViewDetails] = useState(null); // { title, subtitle, image, songs: [] }
+  const [artistDetails, setArtistDetails] = useState(null);
 
   // Data States
   const [homepageData, setHomepageData] = useState({
@@ -338,6 +341,22 @@ export default function App() {
     }
   };
 
+  // Open Singer / Artist Details
+  const handleSelectArtist = async (artistNameOrId) => {
+    if (!artistNameOrId) return;
+    setIsLoading(true);
+    try {
+      const data = await getArtistDetails(artistNameOrId);
+      setArtistDetails(data);
+      setActiveTab('artist');
+    } catch (e) {
+      console.error('Failed to load artist details:', e);
+      handleSearch(artistNameOrId);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   // Custom Playlists Operations
   const handleCreatePlaylist = (name, description) => {
     const newPl = {
@@ -457,6 +476,7 @@ export default function App() {
       <main className="main-viewport">
         <Header
           onSearch={handleSearch}
+          onSelectArtist={handleSelectArtist}
           bitrate={bitrate}
           openQualityModal={() => setIsQualityOpen(true)}
           openEqModal={() => setIsEqOpen(true)}
@@ -468,6 +488,7 @@ export default function App() {
             <>
               <HeroBanner
                 featuredTrack={featuredTrack}
+                onSelectArtist={handleSelectArtist}
                 onPlay={(track) => {
                   if (track.audioStreams) {
                     playTrack(track);
@@ -495,6 +516,7 @@ export default function App() {
                       isPlaying={isPlaying && currentTrack?.id === item.id}
                       isCurrent={currentTrack?.id === item.id}
                       onPlay={() => handleOpenCollection(item)}
+                      onSelectArtist={handleSelectArtist}
                     />
                   ))}
                 </div>
@@ -517,6 +539,7 @@ export default function App() {
                         key={item.id}
                         item={item}
                         onPlay={() => handleOpenCollection(item)}
+                        onSelectArtist={handleSelectArtist}
                       />
                     ))}
                   </div>
@@ -540,6 +563,7 @@ export default function App() {
                         key={item.id}
                         item={item}
                         onPlay={() => handleOpenCollection(item)}
+                        onSelectArtist={handleSelectArtist}
                       />
                     ))}
                   </div>
@@ -565,6 +589,7 @@ export default function App() {
                 onPlayTrack={(track) => playTrack(track, searchResults)}
                 likedTrackIds={likedSet}
                 onToggleLike={handleToggleLike}
+                onSelectArtist={handleSelectArtist}
                 onAddToPlaylist={(track) => {
                   setPlaylistModalConfig({ isOpen: true, mode: 'add_track', track });
                 }}
@@ -593,6 +618,7 @@ export default function App() {
                 onPlayTrack={(track) => playTrack(track, chartTracks)}
                 likedTrackIds={likedSet}
                 onToggleLike={handleToggleLike}
+                onSelectArtist={handleSelectArtist}
                 onAddToPlaylist={(track) => {
                   setPlaylistModalConfig({ isOpen: true, mode: 'add_track', track });
                 }}
@@ -619,6 +645,7 @@ export default function App() {
                 onPlayTrack={(track) => playTrack(track, likedTracks)}
                 likedTrackIds={likedSet}
                 onToggleLike={handleToggleLike}
+                onSelectArtist={handleSelectArtist}
                 onAddToPlaylist={(track) => {
                   setPlaylistModalConfig({ isOpen: true, mode: 'add_track', track });
                 }}
@@ -645,6 +672,7 @@ export default function App() {
                 onPlayTrack={(track) => playTrack(track, playHistory)}
                 likedTrackIds={likedSet}
                 onToggleLike={handleToggleLike}
+                onSelectArtist={handleSelectArtist}
                 onAddToPlaylist={(track) => {
                   setPlaylistModalConfig({ isOpen: true, mode: 'add_track', track });
                 }}
@@ -687,6 +715,7 @@ export default function App() {
                 onPlayTrack={(track) => playTrack(track, selectedPlaylist.tracks)}
                 likedTrackIds={likedSet}
                 onToggleLike={handleToggleLike}
+                onSelectArtist={handleSelectArtist}
                 onAddToPlaylist={(track) => {
                   setPlaylistModalConfig({ isOpen: true, mode: 'add_track', track });
                 }}
@@ -722,12 +751,35 @@ export default function App() {
                 onPlayTrack={(track) => playTrack(track, viewDetails.songs)}
                 likedTrackIds={likedSet}
                 onToggleLike={handleToggleLike}
+                onSelectArtist={handleSelectArtist}
                 onAddToPlaylist={(track) => {
                   setPlaylistModalConfig({ isOpen: true, mode: 'add_track', track });
                 }}
                 onDownloadTrack={() => audioEngine.downloadCurrentTrack()}
               />
             </div>
+          )}
+
+          {/* TAB 8: SINGER / ARTIST PAGE */}
+          {activeTab === 'artist' && (
+            <ArtistView
+              artist={artistDetails}
+              currentTrack={currentTrack}
+              isPlaying={isPlaying}
+              onPlayTrack={(track) => playTrack(track, artistDetails?.songs)}
+              onPlayAll={(songs) => {
+                if (songs && songs.length > 0) {
+                  playTrack(songs[0], songs);
+                }
+              }}
+              onSelectAlbum={handleOpenCollection}
+              likedTrackIds={likedSet}
+              onToggleLike={handleToggleLike}
+              onAddToPlaylist={(track) => {
+                setPlaylistModalConfig({ isOpen: true, mode: 'add_track', track });
+              }}
+              onDownloadTrack={() => audioEngine.downloadCurrentTrack()}
+            />
           )}
         </div>
       </main>
@@ -767,6 +819,7 @@ export default function App() {
         onToggleQueue={() => setIsQueueOpen(!isQueueOpen)}
         isQueueOpen={isQueueOpen}
         onDownload={() => audioEngine.downloadCurrentTrack()}
+        onSelectArtist={handleSelectArtist}
       />
 
       {/* Fullscreen Karaoke Synced Lyrics View */}
@@ -777,6 +830,7 @@ export default function App() {
           currentTime={currentTime}
           onSeek={handleSeek}
           onClose={() => setIsLyricsOpen(false)}
+          onSelectArtist={handleSelectArtist}
         />
       )}
 
@@ -820,6 +874,7 @@ export default function App() {
           }}
           onClearQueue={() => setQueue([])}
           onClose={() => setIsQueueOpen(false)}
+          onSelectArtist={handleSelectArtist}
         />
       )}
 

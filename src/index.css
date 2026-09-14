@@ -26,7 +26,7 @@
   --font-body: 'Plus Jakarta Sans', sans-serif;
   --font-mono: 'JetBrains Mono', monospace;
 
-  --sidebar-width: 250px;
+  --sidebar-width: 260px;
   --player-height: 92px;
   --header-height: 72px;
 
@@ -122,8 +122,17 @@ body {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 0 8px;
+  padding: 0 4px;
   cursor: pointer;
+  white-space: nowrap;
+}
+
+.brand-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .logo-icon {
@@ -135,16 +144,19 @@ body {
   align-items: center;
   justify-content: center;
   box-shadow: 0 0 20px rgba(139, 92, 246, 0.45);
+  flex-shrink: 0;
 }
 
 .logo-text {
   font-family: var(--font-display);
-  font-size: 22px;
+  font-size: 21px;
   font-weight: 800;
   letter-spacing: -0.5px;
   background: linear-gradient(to right, #ffffff, #c4b5fd);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
+  white-space: nowrap;
+  display: inline-block;
 }
 
 .hires-tag {
@@ -152,12 +164,16 @@ body {
   font-size: 9px;
   font-weight: 700;
   color: var(--accent-gold);
+  -webkit-text-fill-color: var(--accent-gold);
   background: rgba(245, 158, 11, 0.15);
   border: 1px solid rgba(245, 158, 11, 0.35);
   padding: 2px 6px;
   border-radius: 4px;
   letter-spacing: 0.5px;
-  margin-left: 2px;
+  margin-left: 0;
+  white-space: nowrap;
+  display: inline-block;
+  flex-shrink: 0;
 }
 
 .nav-section {
@@ -1160,6 +1176,130 @@ body {
   font-family: var(--font-mono);
   font-size: 10px;
   color: var(--accent-cyan);
+}
+
+/* Clickable Singer / Artist Links */
+.clickable-artist {
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  color: inherit;
+  display: inline-block;
+  position: relative;
+}
+
+.clickable-artist:hover {
+  color: #ffffff !important;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-shadow: 0 0 10px rgba(6, 182, 212, 0.5);
+}
+
+/* Artist View Page */
+.artist-view {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.artist-hero-banner {
+  position: relative;
+  min-height: 280px;
+  border-radius: 24px;
+  overflow: hidden;
+  display: flex;
+  align-items: flex-end;
+  padding: 36px 40px;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.6);
+  border: 1px solid var(--border-subtle);
+}
+
+.artist-hero-bg {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center 20%;
+  filter: blur(36px) brightness(0.35);
+  transform: scale(1.15);
+}
+
+.artist-hero-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(6, 7, 10, 0.25) 0%, rgba(6, 7, 10, 0.92) 100%);
+}
+
+.artist-hero-content {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  width: 100%;
+}
+
+.artist-avatar-wrap {
+  position: relative;
+  width: 160px;
+  height: 160px;
+  flex-shrink: 0;
+}
+
+.artist-avatar {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 4px solid rgba(139, 92, 246, 0.6);
+  box-shadow: 0 0 35px rgba(139, 92, 246, 0.45);
+}
+
+.artist-verified-badge {
+  position: absolute;
+  bottom: 4px;
+  right: 4px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #3b82f6;
+  border: 3px solid #0a0b12;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+}
+
+.artist-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+
+.artist-name {
+  font-family: var(--font-display);
+  font-size: 42px;
+  font-weight: 800;
+  letter-spacing: -0.8px;
+  line-height: 1.1;
+  color: #ffffff;
+}
+
+.artist-listeners {
+  font-family: var(--font-body);
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--accent-cyan);
+}
+
+.artist-bio {
+  color: var(--text-muted);
+  font-size: 13px;
+  max-width: 700px;
+  line-height: 1.5;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 /* Responsive adjustments */

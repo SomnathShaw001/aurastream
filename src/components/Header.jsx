@@ -6,6 +6,7 @@ export default function Header({
   onSearch, 
   onSelectTrack, 
   onSelectAlbum, 
+  onSelectArtist,
   bitrate, 
   openQualityModal,
   openEqModal
@@ -58,6 +59,8 @@ export default function Header({
     onSearch(song.title);
   };
 
+  const hasSuggestions = suggestions.songs.length > 0 || suggestions.albums.length > 0 || suggestions.artists.length > 0;
+
   return (
     <header className="app-header">
       {/* Search Bar */}
@@ -71,7 +74,7 @@ export default function Header({
           onChange={(e) => setQuery(e.target.value)}
           onKeyDown={handleKeyDown}
           onFocus={() => {
-            if (suggestions.songs.length > 0) setIsDropdownOpen(true);
+            if (hasSuggestions) setIsDropdownOpen(true);
           }}
         />
         {query && (
@@ -85,11 +88,46 @@ export default function Header({
         )}
 
         {/* Autocomplete Dropdown */}
-        {isDropdownOpen && (suggestions.songs.length > 0 || suggestions.albums.length > 0) && (
+        {isDropdownOpen && hasSuggestions && (
           <div className="search-dropdown">
+            {/* Artists Section */}
+            {suggestions.artists.length > 0 && (
+              <div style={{ marginBottom: '8px' }}>
+                <div style={{ fontSize: '11px', color: 'var(--accent-cyan)', padding: '6px 10px', textTransform: 'uppercase', fontWeight: 700, letterSpacing: '0.6px' }}>
+                  Artists & Singers
+                </div>
+                {suggestions.artists.slice(0, 3).map((item) => (
+                  <div 
+                    key={item.id} 
+                    className="search-item"
+                    onClick={() => {
+                      setIsDropdownOpen(false);
+                      if (onSelectArtist) onSelectArtist(item.title);
+                    }}
+                  >
+                    <img 
+                      src={item.image} 
+                      alt={item.title} 
+                      className="search-thumb" 
+                      style={{ borderRadius: '50%', border: '1px solid var(--accent-cyan)' }} 
+                    />
+                    <div style={{ minWidth: 0 }}>
+                      <div style={{ fontSize: '13px', fontWeight: 700, color: '#fff' }}>
+                        {item.title}
+                      </div>
+                      <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
+                        Artist • Click to view all songs
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Songs Section */}
             {suggestions.songs.length > 0 && (
               <div>
-                <div style={{ fontSize: '11px', color: 'var(--text-dim)', padding: '6px 10px', textTransform: 'uppercase', fontWeight: 700 }}>
+                <div style={{ fontSize: '11px', color: 'var(--text-dim)', padding: '6px 10px', textTransform: 'uppercase', fontWeight: 700, letterSpacing: '0.6px' }}>
                   Songs
                 </div>
                 {suggestions.songs.slice(0, 5).map((item) => (
@@ -112,9 +150,10 @@ export default function Header({
               </div>
             )}
 
+            {/* Albums Section */}
             {suggestions.albums.length > 0 && (
               <div style={{ marginTop: '8px' }}>
-                <div style={{ fontSize: '11px', color: 'var(--text-dim)', padding: '6px 10px', textTransform: 'uppercase', fontWeight: 700 }}>
+                <div style={{ fontSize: '11px', color: 'var(--text-dim)', padding: '6px 10px', textTransform: 'uppercase', fontWeight: 700, letterSpacing: '0.6px' }}>
                   Albums
                 </div>
                 {suggestions.albums.slice(0, 3).map((item) => (

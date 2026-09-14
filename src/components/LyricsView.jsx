@@ -1,12 +1,14 @@
 import React, { useEffect, useRef } from 'react';
 import { X, Mic2, Music } from 'lucide-react';
+import ArtistLinks from './ArtistLinks';
 
 export default function LyricsView({
   track,
   lyricsData,
   currentTime,
   onSeek,
-  onClose
+  onClose,
+  onSelectArtist
 }) {
   const activeLineRef = useRef(null);
   const containerRef = useRef(null);
@@ -57,7 +59,13 @@ export default function LyricsView({
               {track?.title}
             </h2>
             <p style={{ color: 'var(--text-muted)', fontSize: '15px' }}>
-              {track?.artist} • {lyricsData?.isSynced ? 'Karaoke Synced' : 'Static Lyrics'}
+              <ArtistLinks 
+                artistsString={track?.artist} 
+                onSelectArtist={(artist) => {
+                  onClose();
+                  if (onSelectArtist) onSelectArtist(artist);
+                }} 
+              /> • {lyricsData?.isSynced ? 'Karaoke Synced' : 'Static Lyrics'}
             </p>
           </div>
         </div>

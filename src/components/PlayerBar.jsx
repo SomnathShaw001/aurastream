@@ -17,6 +17,7 @@ import {
   Heart,
   Download
 } from 'lucide-react';
+import ArtistLinks from './ArtistLinks';
 
 function formatTime(secs) {
   if (!secs || isNaN(secs)) return '0:00';
@@ -54,7 +55,8 @@ export default function PlayerBar({
   onOpenEqModal,
   onToggleQueue,
   isQueueOpen,
-  onDownload
+  onDownload,
+  onSelectArtist
 }) {
   const progressRef = useRef(null);
 
@@ -103,7 +105,7 @@ export default function PlayerBar({
             {currentTrack.title}
           </span>
           <span className="player-track-artist" title={currentTrack.artist}>
-            {currentTrack.artist}
+            <ArtistLinks artistsString={currentTrack.artist} onSelectArtist={onSelectArtist} />
           </span>
         </div>
 

@@ -1,5 +1,6 @@
 import React from 'react';
 import { Play, Pause, Heart, Download, Plus, Clock } from 'lucide-react';
+import ArtistLinks from './ArtistLinks';
 
 function formatDuration(seconds) {
   if (!seconds || isNaN(seconds)) return '3:30';
@@ -16,7 +17,8 @@ export default function TrackList({
   likedTrackIds = new Set(), 
   onToggleLike,
   onAddToPlaylist,
-  onDownloadTrack
+  onDownloadTrack,
+  onSelectArtist
 }) {
   if (!tracks || tracks.length === 0) {
     return (
@@ -85,7 +87,9 @@ export default function TrackList({
               />
               <div className="track-info-text">
                 <span className="track-info-title">{track.title}</span>
-                <span className="track-info-artist">{track.artist}</span>
+                <span className="track-info-artist">
+                  <ArtistLinks artistsString={track.artist} onSelectArtist={onSelectArtist} />
+                </span>
               </div>
             </div>
 
