@@ -139,6 +139,7 @@ export default function TrackList({
                 <button 
                   className="icon-btn"
                   onClick={(e) => {
+                    e.preventDefault();
                     e.stopPropagation();
                     onDownloadTrack(track);
                   }}

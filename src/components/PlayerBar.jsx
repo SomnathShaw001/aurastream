@@ -311,8 +311,9 @@ export default function PlayerBar({
         {/* Download Track 320kbps */}
         <button 
           className="player-icon-btn"
-          onClick={onDownload}
+          onClick={(e) => { e.preventDefault(); e.stopPropagation(); onDownload?.(); }}
           title="Download Studio Master (320kbps AAC)"
+          type="button"
         >
           <Download size={16} />
         </button>
