@@ -1,7 +1,7 @@
 import CryptoJS from 'crypto-js';
 
-const DES_KEY = '38346591';
-const API_BASE = '/api/saavn';
+const DES_KEY = import.meta.env.VITE_JIOSAAVN_DES_KEY || '';
+const API_BASE = import.meta.env.VITE_JIOSAAVN_API_BASE || '/api/saavn';
 
 // Clean HTML entities from strings (e.g., &quot; &amp;)
 export function decodeHtml(html) {
@@ -22,7 +22,7 @@ export function getHighResImage(url) {
 
 // Decrypt JioSaavn DES-ECB encrypted media URL to direct AAC/MP4 stream
 export function decryptMediaUrl(encryptedUrl) {
-  if (!encryptedUrl) return null;
+  if (!encryptedUrl || !DES_KEY) return null;
   try {
     const key = CryptoJS.enc.Utf8.parse(DES_KEY);
     const decrypted = CryptoJS.DES.decrypt(

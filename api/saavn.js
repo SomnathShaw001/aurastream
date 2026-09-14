@@ -11,7 +11,8 @@ export default async function handler(req, res) {
     const urlObj = new URL(req.url, `https://${host}`);
     const searchParams = urlObj.search;
 
-    const targetUrl = `https://www.jiosaavn.com/api.php${searchParams}`;
+    const baseApiUrl = process.env.JIOSAAVN_API_URL || 'https://www.jiosaavn.com/api.php';
+    const targetUrl = `${baseApiUrl}${searchParams}`;
 
     const response = await fetch(targetUrl, {
       method: 'GET',
